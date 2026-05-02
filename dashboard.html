@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Airport Disruption AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#080c10;--panel:#0d1219;--border:#1a2535;
+      --amber:#f0a500;--cyan:#00d4ff;--green:#00e676;--red:#ff3d57;
+      --text:#c8d8e8;--textd:#4a6278;
+      --mono:'Share Tech Mono',monospace;
+      --cond:'Barlow Condensed',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;flex-direction:column}
+    header{height:52px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .logo-name{font-family:var(--cond);font-weight:700;font-size:0.9rem;letter-spacing:0.2em;color:#fff}
+    .logo-name b{color:var(--amber)}
+    .nav-link{font-size:0.68rem;letter-spacing:0.12em;color:var(--amber);text-decoration:none;border:1px solid var(--amber);padding:5px 12px;border-radius:2px}
+    .nav-link:hover{background:var(--amber);color:#000}
+    main{flex:1;padding:22px;max-width:1400px;margin:0 auto;width:100%}
+    h1{font-family:var(--cond);font-size:0.75rem;letter-spacing:0.25em;color:var(--amber);text-transform:uppercase;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse;font-size:0.72rem}
+    th{font-family:var(--cond);font-size:0.62rem;letter-spacing:0.15em;color:var(--textd);text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+    td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;max-width:260px;word-break:break-word}
+    tr:hover td{background:rgba(255,255,255,0.02)}
+    .empty{color:var(--textd);font-size:0.75rem;letter-spacing:0.12em;padding:24px 0}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo-name">AIRPORT <b>DISRUPTION</b> AI &nbsp;|&nbsp; DASHBOARD</div>
+  <a href="/" class="nav-link">BACK TO CONSOLE</a>
+</header>
+<main>
+  <h1>Disruption Log</h1>
+  <div id="tbl"></div>
+</main>
+<script>
+  fetch('/api/disruptions')
+    .then(function(r){ return r.json(); })
+    .then(function(rows){
+      var el = document.getElementById('tbl');
+      if (!rows || rows.length === 0) {
+        el.innerHTML = '<div class="empty">[ NO RECORDS FOUND ]</div>';
+        return;
+      }
+      var html = '<table><thead><tr>'
+        + '<th>#</th><th>Time</th><th>Flight</th><th>Route</th>'
+        + '<th>Type</th><th>Delay</th><th>Sev</th>'
+        + '<th>Passenger</th><th>Pilot</th><th>Staff</th>'
+        + '</tr></thead><tbody>';
+      rows.forEach(function(r){
+        html += '<tr>'
+          + '<td>'+r[0]+'</td>'
+          + '<td style="white-space:nowrap">'+r[1].replace('T',' ').substring(0,16)+'</td>'
+          + '<td>'+r[2]+'</td>'
+          + '<td>'+r[4]+' &rarr; '+r[5]+'</td>'
+          + '<td>'+r[8]+'</td>'
+          + '<td>'+r[7]+'m</td>'
+          + '<td>'+r[9]+'</td>'
+          + '<td>'+r[11]+'</td>'
+          + '<td>'+r[12]+'</td>'
+          + '<td>'+r[13]+'</td>'
+          + '</tr>';
+      });
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    })
+    .catch(function(){ document.getElementById('tbl').innerHTML = '<div class="empty">[ FAILED TO LOAD ]</div>'; });
+</script>
+</body>
+</html>
